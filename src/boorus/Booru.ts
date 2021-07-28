@@ -7,11 +7,13 @@ import fetch, { FetchError, Response } from 'node-fetch'
 import { BooruError, defaultOptions, searchURI } from '../Constants'
 import { jsonfy, resolveSite, shuffle } from '../Utils'
 
+import { HttpsProxyAgent } from 'https-proxy-agent'
 import InternalSearchParameters from '../structures/InternalSearchParameters'
 import Post from '../structures/Post'
 import SearchParameters from '../structures/SearchParameters'
 import SearchResults from '../structures/SearchResults'
 import Site from '../structures/Site'
+import { BooruOptions } from './BooruOptions'
 
 // Shut up the compiler
 // This attempts to find and use the native browser fetch, if possible
@@ -53,6 +55,8 @@ export class Booru {
   public site: Site
   /** The credentials to use for this booru */
   public credentials: any
+  /** proxy agent */
+  private proxyAgent?: HttpsProxyAgent
 
   /**
    * Create a new booru from a site
@@ -61,7 +65,12 @@ export class Booru {
    * @param {Site} site The site to use
    * @param {Object?} credentials Credentials for the API (Currently not used)
    */
-  constructor(site: Site, credentials: object | null = null) {
+  constructor(site: Site, options: BooruOptions) {
+    const { credentials, proxy } = {
+      credentials: null,
+      proxy: null,
+      ...options,
+    }
     const domain = resolveSite(site.domain)
 
     if (domain === null) {
@@ -71,6 +80,10 @@ export class Booru {
     this.domain = domain
     this.site = site
     this.credentials = credentials
+
+    if (proxy) {
+      this.proxyAgent = new HttpsProxyAgent(proxy)
+    }
   }
 
   /**
@@ -144,7 +157,10 @@ export class Booru {
     const xml = this.site.type === 'xml'
 
     try {
-      const response = await resolvedFetch(fetchuri, options)
+      const response = await resolvedFetch(fetchuri, {
+        agent: this.proxyAgent,
+        ...options,
+      })
 
       // Check for CloudFlare ratelimiting
       if (response.status === 503) {
