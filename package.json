@@ -45,6 +45,7 @@
   },
   "dependencies": {
     "fast-xml-parser": "^3.17.4",
+    "https-proxy-agent": "^5.0.0",
     "node-fetch": "^2.6.1"
   },
   "devDependencies": {

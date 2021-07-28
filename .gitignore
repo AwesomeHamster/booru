@@ -10,7 +10,8 @@ node_modules/*
 dist/*
 
 # Only publish one type of lockfile
-yarn.lock
+# Yeah, but I like yarn ;-)
+package-lock.json
 
 # For those pesky MacOS users
 .DS_Store
