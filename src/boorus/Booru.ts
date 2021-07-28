@@ -63,7 +63,7 @@ export class Booru {
    *
    * @private
    * @param {Site} site The site to use
-   * @param {Object?} credentials Credentials for the API (Currently not used)
+   * @param {BooruOptions} options
    */
   constructor(site: Site, options: BooruOptions) {
     const { credentials, proxy } = {

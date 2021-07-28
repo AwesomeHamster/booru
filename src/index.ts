@@ -14,6 +14,7 @@ import SearchParameters from './structures/SearchParameters'
 import SearchResults from './structures/SearchResults'
 import Site from './structures/Site'
 import { resolveSite } from './Utils'
+import { BooruOptions } from './boorus/BooruOptions'
 
 const BooruTypes: any = {
   derpi: Derpibooru,
@@ -26,13 +27,13 @@ const booruCache: SMap<Booru> = {}
  * Create a new booru, if special type, use that booru, else use default Booru
  *
  * @param {SiteInfo} booruSite The site to use
- * @param {*} credentials The credentials to use, if any
+ * @param {BooruOptions} options
  * @return {Booru} A new booru
  */
-function booruFrom(booruSite: Site, credentials?: any): Booru {
+function booruFrom(booruSite: Site, options?: BooruOptions): Booru {
   return new (booruSite.type !== undefined && BooruTypes[booruSite.type]
     ? BooruTypes[booruSite.type]
-    : Booru)(booruSite, credentials)
+    : Booru)(booruSite, options)
 }
 
 /**
@@ -40,10 +41,10 @@ function booruFrom(booruSite: Site, credentials?: any): Booru {
  *
  * @constructor
  * @param {String} site The {@link Site} domain (or alias of it) to create a booru from
- * @param {*} credentials The credentials to use on this booru
+ * @param {BooruOptions} options
  * @return {Booru} A booru to use
  */
-function booruForSite(site: string, credentials: any = null): Booru {
+function booruForSite(site: string, options?: BooruOptions): Booru {
   const rSite = resolveSite(site)
 
   if (!rSite) throw new BooruError('Site not supported')
@@ -51,7 +52,7 @@ function booruForSite(site: string, credentials: any = null): Booru {
   const booruSite = new Site(sites[rSite])
 
   // If special type, use that booru, else use default Booru
-  return booruFrom(booruSite, credentials)
+  return booruFrom(booruSite, options)
 }
 
 export { booruForSite as forSite }
